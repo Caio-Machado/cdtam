@@ -14,8 +14,6 @@ type OutputSpec struct {
 	Clipboard bool
 }
 
-func (os OutputSpec) Validate() error
-
 func (os OutputSpec) Resolve() ([]Output, error)
 
 func NewOutputSpec(saveFile bool, filePath string, clipboard bool) OutputSpec {
