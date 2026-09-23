@@ -1,9 +1,11 @@
 package output
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"image"
+	"image/png"
 	"os"
 	"path/filepath"
 	"strings"
@@ -33,7 +35,44 @@ type FileOutput struct {
 	FileFormat FileFormat
 }
 
-func (fo FileOutput) Write(img image.Image) error
+func (fo FileOutput) Write(img image.Image) (err error) {
+	var success bool
+	path := fo.FullPath()
+
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("failed to create file %s in directory %s: %w", fo.FileName, fo.Dir, err)
+	}
+	defer func() {
+		closeErr := f.Close()
+
+		if !success {
+			os.Remove(path)
+			return
+		}
+
+		if closeErr != nil && err == nil {
+			err = closeErr
+			os.Remove(path)
+		}
+	}()
+
+	bw := bufio.NewWriter(f)
+
+	switch fo.FileFormat {
+	case PNG:
+		if err := png.Encode(bw, img); err != nil {
+			return fmt.Errorf("failed to encode %s: %w", fo.FileName, err)
+		}
+	}
+
+	if err = bw.Flush(); err != nil {
+		return fmt.Errorf("failed to flush buffer to %s: %w", fo.FileName, err)
+	}
+
+	success = true
+	return nil
+}
 
 func (fo FileOutput) FullPath() string {
 	return filepath.Join(fo.Dir, fo.FileName)
