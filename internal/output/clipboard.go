@@ -10,7 +10,7 @@ type ClipboardOutput struct{}
 
 func (c ClipboardOutput) Write(s capture.Screenshot) error {
 	b := s.Image.Bounds()
-	bgra, err := imaging.ImageToBGRA(s.Image)
+	bgra, err := imaging.NRGBAToBGRA(s.Image)
 	if err != nil {
 		return err
 	}
