@@ -1,37 +1,37 @@
-package cmd
+package cli
 
 import (
 	"fmt"
 
+	"github.com/caio-machado/cdtam/internal/output"
 	"github.com/spf13/cobra"
 )
 
-var (
-	monitorID   int
-	outputPath  string
-	toClipboard bool
-)
+func NewCaptureCmd() *cobra.Command {
+	opts := &output.OutputOpts{}
 
-var captureCmd = &cobra.Command{
-	Use:     "capture",
-	Aliases: []string{"shot", "take"},
-	Short:   "Capture the screen or a specific monitor",
-	Long: `Capture the entire screen (default) or a specific monitor
-and save it as PNG or copy it to the clipboard.`,
-	Example: `  cdtam capture                          # capture all screens
-  cdtam capture -m 0 -o screen.png         # capture monitor 0 to file
-  cdtam capture -m 1 --clipboard           # capture monitor 1 to clipboard
-  cdtam capture -o ./shots/ --clipboard    # save to dir AND clipboard`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Fprintln(cmd.OutOrStdout(), "capture the screen or a specific monitor")
-		return nil
-	},
-}
+	captureCmd := &cobra.Command{
+		Use:   "capture",
+		Short: "Capture the screen or a specific monitor",
+		Args:  cobra.NoArgs,
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if cmd.Flags().Changed("output") && opts.OutDir == "" {
+				return fmt.Errorf("--output requires a non-empty value")
+			}
+			if opts.OutDir == "" && !opts.Clipboard {
+				return fmt.Errorf("at least one of the flags --output or --clipboard must be used")
+			}
+			return nil
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return fmt.Errorf("capture requires a subcommand (available: screen)")
+		},
+	}
 
-func init() {
-	captureCmd.Flags().IntVarP(&monitorID, "monitor", "m", -1, "monitor ID to capture (-1 = all screens)")
-	captureCmd.Flags().StringVarP(&outputPath, "output", "o", "", "output file or directory (default: ./screenshot-<timestamp>.png)")
-	captureCmd.Flags().BoolVarP(&toClipboard, "clipboard", "c", false, "also copy the capture to the clipboard")
+	captureCmd.PersistentFlags().StringVarP(&opts.OutDir, "output", "o", "", "output file or directory (default: ./screenshot-<timestamp>.png)")
+	captureCmd.PersistentFlags().BoolVarP(&opts.Clipboard, "clipboard", "c", false, "also copy the capture to the clipboard")
 
-	rootCmd.AddCommand(captureCmd)
+	captureCmd.AddCommand(NewCaptureScreenCmd(opts))
+
+	return captureCmd
 }
