@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"image"
 	"image/png"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/caio-machado/cdtam/internal/capture"
 )
 
 type FileFormat string
@@ -35,7 +36,7 @@ type FileOutput struct {
 	FileFormat FileFormat
 }
 
-func (fo FileOutput) Write(img image.Image) (err error) {
+func (fo FileOutput) Write(img capture.Screenshot) (err error) {
 	var success bool
 	path := fo.FullPath()
 
@@ -61,7 +62,7 @@ func (fo FileOutput) Write(img image.Image) (err error) {
 
 	switch fo.FileFormat {
 	case PNG:
-		if err := png.Encode(bw, img); err != nil {
+		if err := png.Encode(bw, img.Image); err != nil {
 			return fmt.Errorf("failed to encode %s: %w", fo.FileName, err)
 		}
 	}

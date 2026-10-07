@@ -1,25 +1,35 @@
 package output
 
 import (
-	"image"
+	"github.com/caio-machado/cdtam/internal/capture"
 )
 
-type Output interface {
-	Write(img image.Image) error
-}
-
-type OutputSpec struct {
-	SaveFile  bool
-	FilePath  string
+type OutputOpts struct {
+	OutDir    string
 	Clipboard bool
 }
 
-func (os OutputSpec) Resolve() ([]Output, error)
+func (o OutputOpts) Resolve() ([]capture.Output, error) {
+	var out []capture.Output
 
-func NewOutputSpec(saveFile bool, filePath string, clipboard bool) OutputSpec {
-	return OutputSpec{
-		SaveFile:  saveFile,
-		FilePath:  filePath,
+	if o.OutDir != "" {
+		fileOutput, err := NewFileOutput(o.OutDir)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, fileOutput)
+	}
+
+	if o.Clipboard {
+		out = append(out, ClipboardOutput{})
+	}
+
+	return out, nil
+}
+
+func NewOutputOpts(filePath string, clipboard bool) OutputOpts {
+	return OutputOpts{
+		OutDir:    filePath,
 		Clipboard: clipboard,
 	}
 }
