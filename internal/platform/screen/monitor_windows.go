@@ -66,7 +66,5 @@ func ListMonitors() ([]Monitor, error) {
 		return []Monitor{}, fmt.Errorf("ListMonitors: %w", err)
 	}
 
-	fmt.Println(st.monitors)
-
 	return st.monitors, nil
 }
