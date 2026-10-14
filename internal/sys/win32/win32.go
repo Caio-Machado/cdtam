@@ -1,6 +1,8 @@
 package win32
 
-import "unsafe"
+import (
+	"unsafe"
+)
 
 const (
 	DIB_RGB_COLORS     = 0x00
@@ -22,6 +24,22 @@ type HDC uintptr
 type HGDIOBJ uintptr
 type HBITMAP uintptr
 type DWORD uint32
+type HMONITOR uintptr
+
+type Rect struct {
+	Left   int32
+	Top    int32
+	Right  int32
+	Bottom int32
+}
+
+type MonitorInfoEx struct {
+	CbSize    uint32
+	RcMonitor Rect
+	RcWork    Rect
+	DwFlags   uint32
+	SzDevice  [32]uint16
+}
 
 type bitmapInfoHeader struct {
 	BiSize          uint32
