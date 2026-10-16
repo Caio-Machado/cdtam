@@ -17,12 +17,11 @@ func BGRAToNRGBA(width, height int, pixels []byte) (image.Image, error) {
 		b := pixels[i+0]
 		g := pixels[i+1]
 		r := pixels[i+2]
-		a := pixels[i+3]
 
 		img.Pix[i+0] = r
 		img.Pix[i+1] = g
 		img.Pix[i+2] = b
-		img.Pix[i+3] = a
+		img.Pix[i+3] = 255 // force alpha channel to 255
 	}
 
 	return img, nil
@@ -39,12 +38,11 @@ func NRGBAToBGRA(img image.Image) ([]byte, error) {
 		r := nrgba.Pix[p+0]
 		g := nrgba.Pix[p+1]
 		b := nrgba.Pix[p+2]
-		a := nrgba.Pix[p+3]
 
 		slice[p+0] = b
 		slice[p+1] = g
 		slice[p+2] = r
-		slice[p+3] = a
+		slice[p+3] = 255 // force alpha channel to 255
 	}
 	return slice, nil
 }
