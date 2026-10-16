@@ -56,7 +56,7 @@ func EnumDisplayMonitors(hdc HDC, lprcClip uintptr, lpfnEnum uintptr, dwData uin
 		dwData,
 	)
 	if r == 0 {
-		return err
+		return fmt.Errorf("EnumDisplayMonitors: %w", err)
 	}
 	return nil
 }
